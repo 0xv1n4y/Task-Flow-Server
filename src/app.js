@@ -11,17 +11,22 @@ const app = express();
 
 // ── Security ────────────────────────────────────────────────────────────────
 app.use(helmet());
+const allowedOrigins = new Set(
+  (process.env.CLIENT_URL || '')
+    .split(',')
+    .map((u) => u.trim())
+    .filter(Boolean)
+);
+
 app.use(
   cors({
     origin: (origin, cb) => {
       // Allow requests with no origin (mobile, curl, Postman)
       if (!origin) return cb(null, true);
-      // In development allow any localhost port
-      if (process.env.NODE_ENV !== 'production' && /^http:\/\/localhost(:\d+)?$/.test(origin)) {
-        return cb(null, true);
-      }
-      // In production only allow the configured CLIENT_URL
-      if (origin === process.env.CLIENT_URL) return cb(null, true);
+      // Always allow any localhost port (covers local dev against prod API)
+      if (/^http:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+      // Allow any explicitly listed origin
+      if (allowedOrigins.has(origin)) return cb(null, true);
       cb(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
