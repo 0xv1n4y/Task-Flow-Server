@@ -17,6 +17,14 @@ export const validateTask = [
     .optional()
     .isIn(['high', 'medium', 'low'])
     .withMessage('Invalid priority'),
+  body('dueDate')
+    .optional({ nullable: true })
+    .matches(/^\d{4}-\d{2}-\d{2}$/)
+    .withMessage('dueDate must be in yyyy-MM-dd format'),
+  body('dueTime')
+    .optional({ nullable: true })
+    .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .withMessage('dueTime must be in HH:mm format'),
 ];
 
 export function checkValidation(req, res, next) {

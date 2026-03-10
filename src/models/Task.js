@@ -42,6 +42,15 @@ const taskSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    // Optional due date/time set by the user (future scheduling)
+    dueDate: {
+      type: String,
+      default: null,
+    },
+    dueTime: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: 'createdAtTimestamp', updatedAt: 'updatedAtTimestamp' },
@@ -52,6 +61,7 @@ const taskSchema = new mongoose.Schema(
 // Compound index for efficient per-user queries
 taskSchema.index({ userId: 1, createdAt: -1 });
 taskSchema.index({ userId: 1, completedAt: 1 });
+taskSchema.index({ userId: 1, dueDate: 1 });
 
 const Task = mongoose.model('Task', taskSchema);
 export default Task;

@@ -19,7 +19,7 @@ export async function getTasks(req, res, next) {
 export async function createTask(req, res, next) {
   try {
     const userId = getUserId(req);
-    const { title, description, category, priority } = req.body;
+    const { title, description, category, priority, dueDate, dueTime } = req.body;
 
     const task = await Task.create({
       userId,
@@ -30,6 +30,8 @@ export async function createTask(req, res, next) {
       completed: false,
       createdAt: today(),
       completedAt: null,
+      dueDate: dueDate || null,
+      dueTime: dueTime || null,
     });
 
     res.status(201).json({ success: true, data: task });
@@ -42,7 +44,7 @@ export async function createTask(req, res, next) {
 export async function updateTask(req, res, next) {
   try {
     const userId = getUserId(req);
-    const { title, description, category, priority, completed } = req.body;
+    const { title, description, category, priority, completed, dueDate, dueTime } = req.body;
 
     const task = await Task.findOne({ _id: req.params.id, userId });
     if (!task) return res.status(404).json({ success: false, error: 'Task not found' });
@@ -51,6 +53,9 @@ export async function updateTask(req, res, next) {
     task.description = description ?? task.description;
     task.category = category ?? task.category;
     task.priority = priority ?? task.priority;
+
+    if ('dueDate' in req.body) task.dueDate = dueDate || null;
+    if ('dueTime' in req.body) task.dueTime = dueTime || null;
 
     if (completed !== undefined) {
       task.completed = completed;
