@@ -14,7 +14,7 @@ app.use(helmet());
 const allowedOrigins = new Set(
   (process.env.CLIENT_URL || '')
     .split(',')
-    .map((u) => u.trim())
+    .map((u) => u.trim().replace(/\/$/, ''))
     .filter(Boolean)
 );
 
